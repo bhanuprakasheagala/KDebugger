@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <sstream>
 
+#include <exception>
+
 // Linux system interfaces
 #include <sys/ptrace.h>
 #include <sys/types.h>
@@ -20,9 +22,11 @@
 
 namespace {
 	
+	// will be properly ported to system tomorrow
+
 	// attachs to a currently running process ID
 	// based on the command-line argument passed
-	pid_t attach(int argc, const char** argv) const {
+	pid_t attach(int argc, const char** argv) {
 		pid_t pid = 0;
 		
 		// a PID is passed
@@ -54,7 +58,7 @@ namespace {
 			// given child process
 			if(pid == 0) {
 				// checks if the process to be traced
-				if(ptrace(PTRACE_TRACME, 0, nullptr, nullptr)) {
+				if(ptrace(PTRACE_TRACEME, 0, nullptr, nullptr)) {
 					std::perror("> Program Tracing failed.");
 					return -1;
 				}
@@ -68,9 +72,7 @@ namespace {
 
 		return pid;
 	}
-}
 
-namespace {
 	// a vector of strings used to split commands with a given delimiter
 	std::vector<std::string> split(std::string_view str, char del) {
 		std::vector<std::string> out {};
@@ -92,9 +94,9 @@ namespace {
 		return std::equal(str.begin(), str.end(), str_of.begin());
 	}
 
-}
 
-namespace {
+	// will be ported to process class tomorrow
+	
 	// resumes the specified PID
 	void resume(pid_t pid) {
 		if(ptrace(PTRACE_CONT, pid, nullptr, nullptr) < 0) {
@@ -102,6 +104,8 @@ namespace {
 			std::exit(-1);
 		}	
 	}
+	
+	// will be ported to process class tomorrow
 
 	// waits for a given signal from a PID
 	void wait_on_signal(pid_t pid) {
@@ -113,11 +117,9 @@ namespace {
 			std::exit(-1);
 		}
 	}
-}
 
-namespace {
 	// handles commands given by the command-line as arguments
-	void handle_command(pid_t pid, std::string_view current_line) const {
+	void handle_command(pid_t pid, std::string_view current_line) {
 		auto args = split(current_line, ' ');
 		auto command = args[0];
 
@@ -140,7 +142,7 @@ int main(int argc, const char** argv) {
 		return -1;
 	}
 
-	const pid_t pid = attach(argc, argv);
+	pid_t pid = attach(argc, argv);
 
 	int wait_status;
 	int options {0};
@@ -148,7 +150,7 @@ int main(int argc, const char** argv) {
 	if(waitpid(pid, &wait_status, options) < 0)
 		std::perror("waitpid failed.\n");
 
-	char* line {nullptr};
+	char* line = nullptr;
 	while((line = readline("KDebugger> ")) != nullptr) {
 		std::string line_str {};
 
@@ -170,9 +172,16 @@ int main(int argc, const char** argv) {
 			free(line);
 		}
 
-		if(!line_str.empty())
+		if(!line_str.empty()) {
 			// handles the command given to KDebugger
-			handle_command(pid, line);
+			try {
+				handle_command(pid, line);
+			} 
+			
+			catch(const std::exception & err) {
+				std::cout << err.what() << '\n';
+			}
+		}
 	}
 
 	return EXIT_SUCCESS;

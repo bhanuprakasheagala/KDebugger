@@ -48,3 +48,24 @@ std::unique_ptr<kdebugger::process> kdebugger::process::attach(const pid_t pid) 
 
 	return proc;
 }
+
+// destructor call
+kdebugger::process::~process() {
+
+	if(m_Pid != 0) {
+		int status {};
+		
+		if(m_State == process_state::running) {
+			kill(m_Pid, SIGSTOP);
+			waitpid(m_Pid, &status, 0);
+		}
+
+		ptrace(PTRACE_DETACH, m_Pid, nullptr, nullptr);
+		kill(m_Pid, SIGCONT);
+
+		if(m_Terminate) {
+			kill(m_Pid, SIGKILL);
+			waitpid(m_Pid, &status, 0);
+		}
+	}
+}

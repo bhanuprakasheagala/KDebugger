@@ -22,9 +22,9 @@ namespace {
 }
 
 // launches a given process via a path
-std::unique_ptr<kdebugger::process> kdebugger::process::launch(const std::filesystem::path path) {
+std::unique_ptr<process> process::launch(const std::filesystem::path path) {
 	// set close_on_exec to be true --> pipe.hpp/pipe.cpp
-	kdebugger::pipe channel(true)
+	kpipe channel(true)
 
 	pid_t pid {};
 	if((pid = fork()) < 0) {
@@ -41,6 +41,17 @@ std::unique_ptr<kdebugger::process> kdebugger::process::launch(const std::filesy
 		if(execlp(path.c_str(), path.c_str(), nullptr) < 0) {
 			exit_with_perror(channel, "exec failed");
 		}
+	}
+	
+	channel.close_write();
+	auto data = channel.read();
+	channel.close_read();
+
+	if(data.size() > 0) {
+		waitpid(pid, nullptr, 0);
+		auto chars = reinterpret_cast<char *> (data.data());
+
+		error::send(std::string(chars, chars + data.size()));
 	}
 
 	std::unique_ptr<process> proc = new process(pid, true);

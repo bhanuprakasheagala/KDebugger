@@ -38,6 +38,24 @@ void kdebugger::pipe::close_write() const {
 	}
 }
 
+std::vector<std::byte> kdebugger::pipe::read() {
+	char buffer[1024];
+	int chars_read {};
+
+	if((chars_read = ::read(m_Fds[read_fd], buffer, sizeof(buffer))) < 0) {
+		error::send_errno("Could not read from pipe");
+	}
+
+	auto bytes = reinterpret_cast<std::byte * > (buffer);
+	return std::vector<std::byte> (bytes, bytes + chars_read);
+}
+
+void kdebugger::pipe::write(std::byte * from, const std::size_t bytes) {
+	if(::write(m_Fds[write_fd], from, bytes) < 0) {
+		error::send_errno("Could not write to pipe");
+	}
+}
+
 // destructor handles closing the read and write buffers
 // stored as indexes in m_Fd
 kdebugger::pipe::~pipe() {

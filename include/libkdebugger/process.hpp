@@ -27,10 +27,11 @@ namespace kdebugger {
 		private:	
 			pid_t m_Pid {0};
 			bool m_Terminate {true};
+			bool m_Attached {true};
 			process_state m_State {process_state::stopped};
 
-			process(pid_t pid, bool terminate) : m_Pid {pid},
-				m_Terminate {terminate} {}
+			process(pid_t pid, bool terminate, bool is_attached) : m_Pid {pid},
+				m_Terminate {terminate}, m_Attached {is_attached} {}
 
 		public:
 			// delete default constructor
@@ -43,7 +44,8 @@ namespace kdebugger {
 			process& operator=(const process &) = delete
 
 			// launch debugger on a given process, return a static unique instance 
-			static std::unique_ptr<process> launch(const std::filesystem::path path);
+			static std::unique_ptr<process> launch(const std::filesystem::path path, 
+					bool debug = true;);
 			// attach to a currently running PID, return a static unique instance of ID
 			static std::unique_ptr<process> attach(const pid_t pid);
 

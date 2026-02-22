@@ -22,7 +22,7 @@ namespace {
 }
 
 // launches a given process via a path
-std::unique_ptr<process> process::launch(const std::filesystem::path path) {
+std::unique_ptr<process> process::launch(const std::filesystem::path path, bool debug) {
 	// set close_on_exec to be true --> pipe.hpp/pipe.cpp
 	kpipe channel(true)
 
@@ -34,7 +34,7 @@ std::unique_ptr<process> process::launch(const std::filesystem::path path) {
 	if(pid == 0) {
 		
 		channel.close_read();
-		if(ptrace(PTRACE_TRACEME, 0, nullptr, nullptr) < 0) {
+		if(debug && ptrace(PTRACE_TRACEME, 0, nullptr, nullptr) < 0) {
 			exit_with_perror(channel, "Tracing failed");
 		}
 
@@ -55,7 +55,9 @@ std::unique_ptr<process> process::launch(const std::filesystem::path path) {
 	}
 
 	std::unique_ptr<process> proc = new process(pid, true);
-	proc->wait_on_signal();
+	
+	if(debug)
+		proc->wait_on_signal();
 
 	return proc;
 }

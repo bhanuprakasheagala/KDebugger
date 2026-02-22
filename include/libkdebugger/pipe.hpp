@@ -27,6 +27,6 @@ namespace kdebugger {
 		private:
 			int m_Fds[2];
 			static constexpr unsigned int read_fd {0};
-		       	static constexpr unsigned int write_fd {0};	
+		    static constexpr unsigned int write_fd {0};	
 	};
 }

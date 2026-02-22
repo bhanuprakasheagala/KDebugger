@@ -2,8 +2,8 @@
 ![License](https://img.shields.io/badge/license-GPL-green)
 
 > [!NOTE]
-> This Project is still heavily under development and may lack some
-> given features at the current time. These will be implemented :)
+> C++20 Implementation of KDebugger - Notably, using Multithreading and Coroutine
+> functionalities to improve performance, we'll see when I profile it
 <br>
 
 > [!IMPORTANT]

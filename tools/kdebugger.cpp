@@ -19,6 +19,7 @@
 
 // Private/Project-specific headers
 #include <libkdebugger/libkdebugger.hpp>
+#include <libkdebugger/process.hpp>
 
 namespace {
 	
@@ -82,6 +83,31 @@ namespace {
 			std::perror("> waitpid failed.\n");
 			std::exit(-1);
 		}
+	}
+}
+
+namespace {
+
+	void print_stop_reason(const kdebugger::process & process,
+			kdebugger::stop_reason reason) {
+		
+		std::cout << "Process: " << process.pid() << ' ';
+		
+		switch(reason.reason) {
+			case kdebugger::process_state::exited:
+				std::cout << "Exited with status: " << static_cast<int>(reason.info);
+				break;
+
+			case kdebugger::process_state::terminated:
+				std::cout << "Terminated wtih signal: " << sigabbrev_np(reason.info);
+				break;
+			
+			case kdebugger::process_state::stopped:
+				std::cout <<  "Stopped with signal: " << sigabbrev_np(reason.info);
+				break;
+		}
+
+		std::cout << std::endl;
 	}
 
 	// handles commands given by the command-line as arguments

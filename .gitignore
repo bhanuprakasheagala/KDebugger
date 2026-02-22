@@ -41,4 +41,12 @@
 *.dwo
 
 # CMake Build files
-build/*
+build/CMakeCache.txt
+build/CMakeFiles/*
+build/src/*
+build/test/*
+build/Testing/*
+build/tools/*
+build/CTestTestfile.cmake
+build/cmake_install.cmake
+build/DartConfiguration.tcl

@@ -59,6 +59,40 @@ void sdb::process::resume() {
 	m_State = process_state::running;
 }
 
+// produce a stop reason for why the process
+// was stopped by an exit code or signal
+kdebugger::stop_reason::stop_reason(int wait_status) {
+	
+	if(WIFEXITED(wait_status)) {
+		reason = process_state::exited;
+		info = WEXITSTATUS(wait_status);
+	}
+
+	else if(WIFSIGNAL(wait_status)) {
+		reason = process_state::terminated;
+		info = WTERMSIG(wait_status);		
+	}
+
+	else if(WIFSTOPPED(wait_status)) {
+		reason = process_state::stopped;
+		info = WSTOPSIG(wait_status);
+	}
+}
+
+kdebugger::stop_reason kdebugger::process::wait_on_signal() {
+	
+	int wait_status;
+	int options {0};
+
+	if(waitpid(m_Pid, &wait_status, options) < 0) {
+		error::send_errno("waitpid failed");
+	}
+
+	stop_reason reason(wait_status);
+	m_State = reason.reason;
+	return reason;
+}
+
 // destructor call
 kdebugger::process::~process() {
 

@@ -1,11 +1,11 @@
 # KDebugger
 ![License](https://img.shields.io/badge/license-GPL-green)
 
-> **Note**
+> Note
 > This Project is still heavily under development and may lack some
 > given features at the current time. These will be implemented :)
 
-> **Warning**
+> Warning
 > This is a strictly Linux Based Debugger (for now) and complies with
 > the POSIX standards. If you're not running linux and intend to test
 > this on windows - I will eventually come to make a port :)

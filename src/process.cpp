@@ -49,6 +49,16 @@ std::unique_ptr<kdebugger::process> kdebugger::process::attach(const pid_t pid) 
 	return proc;
 }
 
+// resumes a process being held
+void sdb::process::resume() {
+	
+	if(ptrace(PTRACE_CONT, m_Pid, nullptr, nullptr) < 0) {
+		error::send_errno("Could not resume Process");
+	}
+
+	m_State = process_state::running;
+}
+
 // destructor call
 kdebugger::process::~process() {
 

@@ -28,18 +28,59 @@ namespace {
 	}
 }
 
+// in case - tests if the program launched exists
+// as a process and therefore can be halted/resumed
 TEST_CASE("process::launch success", "[process]") {
 	auto proc = process::launch("yes");
 	REQUIRE(process_exists(proc->pid));
 }
 
+// in case - program passed to attach does not exist
 TEST_CASE("process::launch no such program", "[process]") {
 	REQUIRE_THROW_AS(process::launch("example_program"), error);
 }
 
+// in case - if the process in procfs has stopped being traced
 TEST_CASE("process::attach success", "[process]") {
 	// launches a program without attaching
 	auto pid {};
 	auto proc = process::attach(pid);
 	REQUIRE(get_process_status(pid) == 't');
+}
+
+// in case - checking we aren't attaching to an already
+// attached process or program
+TEST_CASE("process::attach success", "[process]") {
+	auto target = process::launch("targets/run_endlessly", false);
+	auto proc = process::attach(target->pid());
+	REQUIRE(get_process_status(target->pid()) == 't');
+}
+
+// in case - an invalid PID is trying to be attached to
+TEST_CASE("process::attach invalid PID", "[process]") {
+	REQUIRE_THROW_AS(process::attach(0), error);
+}
+
+// in case - fundamentally testing pre-existing and forked
+// process that may be launched by the debugger
+TEST_CASE("process::resume success", "[process]") {
+	// where launch debug = true
+	{
+		auto proc = process::launch("targets/run_endlessly");
+		proc->resume();
+
+		auto status = get_process_status(proc->pid());
+		auto success = (status == 'R' || status == 'S');
+		REQUIRE(success);
+	}
+	
+	// where launch debug = false
+	{
+		auto target = process::launch("targets/run_endlessly", false);
+		proc->resume();
+
+		auto status = get_process_status(proc->pid());
+		auto success = (status == 'R' || status == 'S');
+		REQUIRE(success);
+	}
 }

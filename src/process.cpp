@@ -73,7 +73,7 @@ std::unique_ptr<kdebugger::process> kdebugger::process::attach(const pid_t pid) 
 		error::send_errno("Could not attach");
 	}
 
-	std::unique_ptr<process> proc = new process(pid, false);
+	std::unique_ptr<process> proc = new process(pid, false, true);
 	proc->wait_on_signal;
 
 	return proc;

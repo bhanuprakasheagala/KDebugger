@@ -36,3 +36,10 @@ TEST_CASE("process::launch success", "[process]") {
 TEST_CASE("process::launch no such program", "[process]") {
 	REQUIRE_THROW_AS(process::launch("example_program"), error);
 }
+
+TEST_CASE("process::attach success", "[process]") {
+	// launches a program without attaching
+	auto pid {};
+	auto proc = process::attach(pid);
+	REQUIRE(get_process_status(pid) == 't');
+}

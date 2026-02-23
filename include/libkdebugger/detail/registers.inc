@@ -104,3 +104,5 @@ DEFINE_GPR_8L(r10b, r10), DEFINE_GPR_8L(r11b, r11),
 DEFINE_GPR_8L(r12b, r12), DEFINE_GPR_8L(r13b, r13),
 DEFINE_GPR_8L(r14b, r14), DEFINE_GPR_8L(r15b, r15),
 
+#define FPR_OFFSET(reg) (offsetof(user, i387) + offsetof(user_fpregs_struct, reg))
+#define FPR_SIZE(reg) (sizeof(user_fpregs_struct::reg))

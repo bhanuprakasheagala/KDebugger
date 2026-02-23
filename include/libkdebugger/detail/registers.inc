@@ -22,6 +22,7 @@
 		register_type::sub_gpr, register_format::uint)
 
 // helper macro for 8bit HIGH sub GPR
+// offset + 1 here to access the second byte
 #define DEFINE_GPR_8H(name, super) \
 	DEFINE_REGISTER(name, -1, 1, GPR_OFFSET(super) + 1, \
 		register_type::sub_gpr, register_format::uint)
@@ -31,4 +32,34 @@
 	DEFINE_REGISTER(name, -1, 1, GPR_OFFSET(super), \
 		register_type::sub_gpr, register_format::uint)
 
+// definitions for 64bit general purpose registers
+DEFINE_GPR_64(rax, 0);
+DEFINE_GPR_64(rdx, 1);
+DEFINE_GPR_64(rcx, 2);
+DEFINE_GPR_64(rbx, 3);
+
+DEFINE_GPR_64(rsi, 4);
+DEFINE_GPR_64(rdi, 5);
+DEFINE_GPR_64(rbp, 6);
+DEFINE_GPR_64(rsp, 7);
+
+DEFINE_GPR_64(r8, 8);
+DEFINE_GPR_64(r9, 9);
+DEFINE_GPR_64(r10, 10);
+DEFINE_GPR_64(r11, 11);
+DEFINE_GPR_64(r12, 12);
+DEFINE_GPR_64(r13, 13);
+DEFINE_GPR_64(r14, 14);
+DEFINE_GPR_64(r15, 15);
+
+DEFINE_GPR_64(rip, 16);
+
+DEFINE_GPR_64(eflags, 49);
+
+DEFINE_GPR_64(cs, 51);
+DEFINE_GPR_64(fs, 54);
+DEFINE_GPR_64(gs, 55);
+DEFINE_GPR_64(ss, 52);
+DEFINE_GPR_64(ds, 53);
+DEFINE_GPR_64(es, 50);
 

@@ -1,5 +1,12 @@
 #pragma once
 
+// General headers
+#include <cstring>
+
+// Private / Project-specific headers
+#include <libkdebugger/types.hpp>
+
+
 namespace kdebugger {
 
 	template <class To> To from_bytes(const std::byte * bytes) {
@@ -15,5 +22,19 @@ namespace kdebugger {
 
 	template <class From> const std::byte * as_bytes(const From & from) {
 		return reinterpret_cast<const std::byte *> (&from);
+	}
+
+	template <class From> byte128 to_byte128(From src) {
+		byte128 ret {};
+		std::memcpy(&ret, &src, sizeof(From));
+
+		return ret;
+	}
+
+	template <class From> byte64 to_byte64(From src) {
+		byte64 ret {};
+		std::memcpy(&ret, &src, sizeof(From));
+
+		return ret;
 	}
 }

@@ -109,6 +109,8 @@ kdebugger::stop_reason::stop_reason(int wait_status) {
 	}
 }
 
+// waits for a signal to be passed - passes a reason back
+// to our state object in case of exception 
 kdebugger::stop_reason kdebugger::process::wait_on_signal() {
 	
 	int wait_status;
@@ -129,13 +131,15 @@ kdebugger::process::~process() {
 	if(m_Pid != 0) {
 		int status {};
 		
-		if(m_State == process_state::running) {
-			kill(m_Pid, SIGSTOP);
-			waitpid(m_Pid, &status, 0);
-		}
+		if(m_Attached) {
+			if(m_State == process_state::running) {
+				kill(m_Pid, SIGSTOP);
+				waitpid(m_Pid, &status, 0);
+			}
 
-		ptrace(PTRACE_DETACH, m_Pid, nullptr, nullptr);
-		kill(m_Pid, SIGCONT);
+			ptrace(PTRACE_DETACH, m_Pid, nullptr, nullptr);
+			kill(m_Pid, SIGCONT);
+		} 
 
 		if(m_Terminate) {
 			kill(m_Pid, SIGKILL);

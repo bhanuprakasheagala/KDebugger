@@ -76,6 +76,11 @@ project tree structure, to build:
 ```
 cd build && cmake ..
 ```
+
+```
+cmake .. -DCTOOL_CHAIN_USE
+```
+
 ```
 make
 ```

@@ -2,6 +2,7 @@
 #include <libkdebugger/registers.hpp>
 #include <libkdebugger/bit.hpp>
 
+// reading a specific valued register
 kdebugger::registers::value kdebugger::registers::read(const register_info & info) const {
 	auto bytes = as_bytes(m_Data);
 
@@ -39,4 +40,9 @@ kdebugger::registers::value kdebugger::registers::read(const register_info & inf
 	else {
 		return from_bytes<byte128> (bytes + info.offset);
 	}
+}
+
+// writing to a register in bytes
+void sdb::registers::write(const register_info & info, value val) {
+	auto bytes = as_bytes(m_Data);
 }

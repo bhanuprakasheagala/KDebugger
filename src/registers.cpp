@@ -52,7 +52,7 @@ void sdb::registers::write(const register_info & info, value val) {
 
 	// visit -> takes a callback && std::variant to call a function
 	// with the value stored in our type-safe union
-	std::visit([&](auto & v) {
+	std::visit([&](auto & v) -> void {
 		if(sizeof(v) == info.size) {
 			auto val_bytes = as_bytes(v);
 

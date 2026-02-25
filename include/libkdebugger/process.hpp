@@ -50,8 +50,13 @@ namespace kdebugger {
 			/* registers extension --- */
 			registers & get_registers() { return *m_Registers; }
 			const registers & get_registers() { return *m_Registers; }
-
+			
+			// write to an equal sized register, given an offset
 			void write_user_area(std::size_t offset, std::uint64_t data) const;
+			
+			// writing to all the GPRs and FPRs at once
+			void write_fgprs(const user_fpregs_struct & fprs);
+			void write_gprs(const user_regs_struct & gprs);
 
 			// delete copy constructor
 			process(const process &) = delete;

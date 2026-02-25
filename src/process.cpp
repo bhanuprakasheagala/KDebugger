@@ -122,6 +122,10 @@ kdebugger::stop_reason kdebugger::process::wait_on_signal() {
 
 	stop_reason reason(wait_status);
 	m_State = reason.reason;
+
+	if(m_Attached && m_State == process_state::stopped)
+		read_all_registers();
+
 	return reason;
 }
 

@@ -159,6 +159,16 @@ void kdebugger::process::read_all_registers() const {
 
 	for(size_t i {0}; i < 8; ++i) {
 		// reads debug registers
+		auto id = static_cast<int> (register_id::dr0) + i;
+		auto info = register_info_by_id(static_cast<register_id> (id));
+
+		errno = 0;
+		std::uint64_t data = ptrace(PTRACE_PEEKUSER, m_Pid, info.offset, nullptr);
+
+		if(errno != 0)
+			error::send_errno("Could not read debug register");
+
+		get_registers().m_Data.u_debugreg[i] = data;
 	}
 }	
 

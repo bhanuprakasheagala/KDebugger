@@ -147,3 +147,17 @@ kdebugger::process::~process() {
 		}
 	}
 }
+
+// register read all values
+void kdebugger::process::read_all_registers() const {
+	
+	if(ptrace(PTRACE_GETREGS, m_Pid, nullptr, &get_registers().m_Data.i387) < 0)
+		error::send_errno("Could not read GPR registers");
+
+	if(ptrace(PTRACE_GETFPREGS, m_Pid, nullptr, &get_registers().m_Data.i387) < 0)
+		error::send_errno("Could not read FPR registers");
+
+	for(size_t i {0}; i < 8; ++i) {
+		// reads debug registers
+	}
+}	

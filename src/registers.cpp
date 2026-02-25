@@ -66,4 +66,9 @@ void sdb::registers::write(const register_info & info, value val) {
 			std::terminate();
 		}
 	}, val);
+
+	m_Process->write_user_area(info.offset, 
+			from_bytes<std::uint64_t> (bytes + info.offset));
 }
+
+

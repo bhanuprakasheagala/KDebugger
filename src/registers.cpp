@@ -66,13 +66,21 @@ void sdb::registers::write(const register_info & info, value val) {
 			std::terminate();
 		}
 	}, val);
-	
-	// aligns the lowest 3 bits in the address to 0
-	// forced to be 8 byte aligned 
-	auto aligned_offset = info.offset & ~0b111;
 
-	m_Process->write_user_area(aligned_offset, 
-			from_bytes<std::uint64_t> (bytes + aligned_offset));
+
+	if(info.type == register_type::fpr) {
+		m_Process->write_fprs(m_Data.i387);
+	}
+
+	else {	
+		// aligns the lowest 3 bits in the address to 0
+		// forced to be 8 byte aligned 
+		auto aligned_offset = info.offset & ~0b111;
+		m_Process->write_user_area(aligned_offset, 
+				from_bytes<std::uint64_t> (bytes + aligned_offset));
+	}
 }
+
+
 
 

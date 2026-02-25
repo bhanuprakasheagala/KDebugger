@@ -56,9 +56,10 @@ namespace {
 		// visit -> takes a callback && std::variant to call a function
 		// with the value stored in our type-safe union
 		std::visit([&](auto & v) -> void {
-			if(sizeof(v) == info.size) {
-				auto val_bytes = as_bytes(v);
+			if(sizeof(v) <= info.size) {
+				auto wide = widen(info, v);
 
+				auto val_bytes = as_bytes(wide);
 				std::copy(val_bytes, val_bytes + sizeof(v),
 						bytes + info.offset);
 			}	

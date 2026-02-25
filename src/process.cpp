@@ -182,3 +182,16 @@ void kdebugger::process::write_user_area(std::size_t offset, std::uint64_t data)
 	if(ptrace(PTRACE_POKEUSER, m_Pid, offset, data) < 0)
 		error::send_errno("Could not write to user area");
 }
+
+// write to all the fprs in the x87 space
+void kdebugger::process::write_fprs(const user_fpregs_struct & fprs) {
+	
+	if(ptrace(PTRACE_SETFPREGS, m_Pid, nullptr, &fprs) < 0)
+		error::send_errno("Could not write floating point registers");
+}
+
+void kdebugger::process::write_gprs(const user_regs_struct & gprs) {
+	
+	if(ptrace(PTRACE_SETREGS, m_Pid, nullptr, &gprs) < 0)
+		error::send_errno("Could not write geenral purpose registers");
+}

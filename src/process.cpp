@@ -161,3 +161,10 @@ void kdebugger::process::read_all_registers() const {
 		// reads debug registers
 	}
 }	
+
+// write to a register given a similar user area
+void kdebugger::process::write_user_area(std::size_t offset, std::uint64_t data) {
+	
+	if(ptrace(PTRACE_POKEUSER, m_Pid, offset, data) < 0)
+		error::send_errno("Could not write to user area");
+}

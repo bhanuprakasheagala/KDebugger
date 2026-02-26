@@ -22,9 +22,10 @@ namespace {
 }
 
 // launches a given process via a path
-std::unique_ptr<process> process::launch(const std::filesystem::path path, bool debug) {
+std::unique_ptr<process> process::launch(const std::filesystem::path path, 
+		bool debug, std::optional<int> stdout_replacement) {
 	// set close_on_exec to be true --> pipe.hpp/pipe.cpp
-	kpipe channel(true)
+	pipe channel(true)
 
 	pid_t pid {};
 	if((pid = fork()) < 0) {
@@ -34,6 +35,12 @@ std::unique_ptr<process> process::launch(const std::filesystem::path path, bool 
 	if(pid == 0) {
 		
 		channel.close_read();
+
+		if(stdout_replacement()) {
+			if(dup2(*stdout_replacement, STDOUT_FILENO) < 0)
+				exit_with_perror(channel, "stdout replacement failed");
+		}
+
 		if(debug && ptrace(PTRACE_TRACEME, 0, nullptr, nullptr) < 0) {
 			exit_with_perror(channel, "Tracing failed");
 		}

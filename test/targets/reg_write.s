@@ -31,16 +31,17 @@ main:
 	call fflush@plt
 	trap
 	
-	# Print contents of MM0
 	movq %mm0, %rsi
 
+	# prints value to MM0 = MMX
 	leaq hex_format(%rip), %rdi
 	movq $0, %rax
 	call printf@plt
 	movq $0, %rdi
 	call fflush@plt
 	trap
-
+	
+	# prints contents of xmm0 = SSE
 	leaq float_format(%rip), %rdi
 	movq $1, %rax
 	call printf@plt

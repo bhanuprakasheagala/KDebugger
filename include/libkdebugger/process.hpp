@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <memory>
 #include <sys/types.h>
+#include <optional>
 
 // Private / project specific headers
 #include <libkdebugger/registers.hpp>
@@ -66,7 +67,8 @@ namespace kdebugger {
 
 			// launch debugger on a given process, return a static unique instance 
 			static std::unique_ptr<process> launch(const std::filesystem::path path, 
-					bool debug = true;);
+					bool debug = true, 
+					std::optional<int> stdout_replacement = std::nullopt);
 			// attach to a currently running PID, return a static unique instance of ID
 			static std::unique_ptr<process> attach(const pid_t pid);
 

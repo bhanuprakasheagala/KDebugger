@@ -68,7 +68,8 @@ namespace {
 				return fmt::format("[{:#04x}]", fmt::join(t, ","));
 			}
 		}
-
+		
+		// formatted print to output for reading all registers
 		if(args.size() == 2 || (args.size() == 3 && args[2] == "all")) {
 			
 			for(auto & info : kdebugger::register_infos) {
@@ -82,6 +83,24 @@ namespace {
 				auto value = process.get_registers().read(info);
 				fmt::print("{}:\t{}\n", info.name, std::visit(format, value));
 			}
+		}
+		
+		// formatted print to output if reading a single register by name
+		else if(args.size() == 3) {
+			try {
+				auto info = kdebugger::register_info_by_name().read(info);
+				auto value = process.get_registers().read(info);
+				fmt::print("{}:\t{}\n", info.name, std::visit(format, value));
+			} 
+			catch(kdebugger::error & err) {
+				std::cerr << "Invalid register name!\n";
+				return;
+			}
+		}
+
+		// command for reading isnt found, print known commands
+		else {
+			print_help({"help", "registers"});
 		}
 	}
 

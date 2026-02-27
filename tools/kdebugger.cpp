@@ -104,6 +104,26 @@ namespace {
 		}
 	}
 
+	// handles writing to a given register with a value
+	void handle_register_write(kdebugger::process & process, 
+			const std::vector<std::string> & args) {
+		
+		if(args.size() != 4) {
+			print_help({"help", "register"});
+			return;
+		}
+
+		try {
+			auto info = kdebugger::register_info_by_name(args[2]);
+			auto value = parse_register_value(info, args[3]);
+			process.get_registers().write(info, value);
+		}
+		catch(kdebugger::error & err) {
+			std::cerr << err.what() << '\n';
+			return;
+		}
+	}
+
 	// handles commands relating to reading and writing
 	// to and from registers
 	void handle_register_command(kdebugger::process & process, 

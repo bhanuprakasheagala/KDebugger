@@ -53,7 +53,9 @@ namespace {
 	void handle_register_read(kdebugger::process & process, 
 			const std::vector<std::string> & args) {
 		
-		auto format = [] (auto t) {
+		// for formatting cmd arguments when requested
+		auto format = [] (auto t) -> std::string {
+
 			if constexpr (std::is_floating_point_v<decltype(t)>) {
 				return fmt::format("{}", t);
 			}
@@ -64,6 +66,21 @@ namespace {
 
 			else {
 				return fmt::format("[{:#04x}]", fmt::join(t, ","));
+			}
+		}
+
+		if(args.size() == 2 || (args.size() == 3 && args[2] == "all")) {
+			
+			for(auto & info : kdebugger::register_infos) {
+				auto should_print = (args.size() == 3 
+						|| info.type == kdebugger::register_type::gpr)
+						&& info.name != "orig_rax";
+				
+				if(!should_print)
+					continue;
+
+				auto value = process.get_registers().read(info);
+				fmt::print("{}:\t{}\n", info.name, std::visit(format, value));
 			}
 		}
 	}

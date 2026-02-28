@@ -8,6 +8,7 @@
 
 // Private / project specific headers
 #include <libkdebugger/registers.hpp>
+#include <libkdebugger/types.hpp>
 
 // kdebugger::process::
 namespace kdebugger {
@@ -79,6 +80,13 @@ namespace kdebugger {
 
 			pid_t pid() const {
 				return m_Pid;
+			}
+	
+			// helper function for getting the program counter
+			virt_addr get_pc() const {
+				return virt_addr {
+					get_registers().read_by_id_as<std::uint64_t> (register_id::rip)
+				};
 			}
 
 			~process();

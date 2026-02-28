@@ -5,10 +5,12 @@
 #include <memory>
 #include <sys/types.h>
 #include <optional>
+#include <vector>
 
 // Private / project specific headers
 #include <libkdebugger/registers.hpp>
 #include <libkdebugger/types.hpp>
+#include <libkdebugger/breakpoint_site.hpp>
 
 // kdebugger::process::
 namespace kdebugger {
@@ -40,6 +42,9 @@ namespace kdebugger {
 
 			// holds the address of our registers
 			std::unique_ptr<registers> m_Registers;
+
+			// vector of unique break point sites
+			std::vector<std::unique_ptr<breakpoint_site>> m_BreakPointSites;
 
 			process(pid_t pid, bool terminate, bool is_attached) : m_Pid {pid},
 				m_Terminate {terminate}, m_Attached {is_attached},
@@ -88,6 +93,9 @@ namespace kdebugger {
 					get_registers().read_by_id_as<std::uint64_t> (register_id::rip)
 				};
 			}
+
+			// iterating over breakpoint sites - returns memory location
+			breakpoint_site & create_breakpoint_site(virt_addr address);
 
 			~process();
 	};

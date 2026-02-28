@@ -22,4 +22,15 @@ namespace kdebugger {
 
 		return ret;
 	}
+
+	template <class F>
+	std::optional<F> to_float(std::string_view sv) {
+		F ret;
+		auto result = std::from_chars(sv.begin(), sv.end(), ret);
+
+		if(result.ptr != sv.end())
+			return std::nullopt;
+
+		return ret;
+	}
 }

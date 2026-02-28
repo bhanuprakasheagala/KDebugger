@@ -11,6 +11,7 @@
 #include <libkdebugger/registers.hpp>
 #include <libkdebugger/types.hpp>
 #include <libkdebugger/breakpoint_site.hpp>
+#include <libkdebugger/stoppoint_collection.hpp>
 
 // kdebugger::process::
 namespace kdebugger {
@@ -44,7 +45,10 @@ namespace kdebugger {
 			std::unique_ptr<registers> m_Registers;
 
 			// vector of unique break point sites
-			std::vector<std::unique_ptr<breakpoint_site>> m_BreakPointSites;
+			// std::vector<std::unique_ptr<breakpoint_site>> m_BreakPointSites;
+
+			// collection of stop points in the breakpoint site
+			stoppoint_collection<breakpoint_site> m_BreakPointSites;
 
 			process(pid_t pid, bool terminate, bool is_attached) : m_Pid {pid},
 				m_Terminate {terminate}, m_Attached {is_attached},
@@ -96,6 +100,16 @@ namespace kdebugger {
 
 			// iterating over breakpoint sites - returns memory location
 			breakpoint_site & create_breakpoint_site(virt_addr address);
+			
+			// non-const and const overloads for breakpoint sites to return
+			// the current breakpoint site
+			stoppoint_collection<breakpoint_site> & breakpoint_sites() {
+				return m_BreakPointSites;
+			}
+
+			stoppoint_collection<breakpoint_site> & breakpoint_sites() {
+				return m_BreakPointSites;
+			}
 
 			~process();
 	};

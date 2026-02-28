@@ -5,6 +5,8 @@
 #include <stdint>
 #include <optional>
 #include <string_view>
+#include <array>
+#include <cstddef>
 
 namespace kdebugger {
 
@@ -32,5 +34,26 @@ namespace kdebugger {
 			return std::nullopt;
 
 		return ret;
+	}
+
+	template <std::size_t N>
+	auto parse_vector(std::string_view text) {
+		auto invalid = [] { 
+			kdebugger::error::send("Invalid format!\n");
+		};
+
+		std::array<std::byte, N> bytes;
+		const char* ch = text.data();
+
+		if(*ch++ != '[')
+			invalid();
+
+		for(auto i {0}; i < N - 1; ++i) {
+			bytes[i] = to_integral<std::byte> ({c, 4}, 16).value();
+			ch += 4;
+
+			if(*c++ != ',')
+				invalid();
+		}
 	}
 }

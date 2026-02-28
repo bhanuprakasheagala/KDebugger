@@ -258,23 +258,25 @@ namespace {
 	void print_stop_reason(const kdebugger::process & process,
 			kdebugger::stop_reason reason) {
 		
-		std::cout << "Process: " << process.pid() << ' ';
-		
+		std::string message;	
 		switch(reason.reason) {
 			case kdebugger::process_state::exited:
-				std::cout << "Exited with status: " << static_cast<int>(reason.info);
+				message = fmt::format("Exited with status: {}", 
+						static_cast<int> (reason.info));
 				break;
 
 			case kdebugger::process_state::terminated:
-				std::cout << "Terminated wtih signal: " << sigabbrev_np(reason.info);
+				message = fmt::format("Terminated with signal: {}", 
+						sigabbrev_np(reason.info));
 				break;
 			
 			case kdebugger::process_state::stopped:
-				std::cout <<  "Stopped with signal: " << sigabbrev_np(reason.info);
+				message = fmt::format("Stopped with signal:{}  at {:#x}", 
+						sigabbrev_np(reason.info), process.get_pc().addr());
 				break;
 		}
-
-		std::cout << std::endl;
+		
+		fmt::print("Process {} {}\n", process.pid(), message);
 	}
 
 	// handles commands given by the command-line as arguments

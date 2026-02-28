@@ -49,11 +49,20 @@ namespace kdebugger {
 			invalid();
 
 		for(auto i {0}; i < N - 1; ++i) {
-			bytes[i] = to_integral<std::byte> ({c, 4}, 16).value();
+			bytes[i] = to_integral<std::byte> ({ch, 4}, 16).value();
 			ch += 4;
 
 			if(*c++ != ',')
 				invalid();
 		}
+
+		bytes[N - 1] = to_integral<std::byte> ({ch, 4}, 16).value();
+		ch += 4;
+
+		if(*ch++ != ']')
+			invalid();
+
+		if(ch != text.end())
+			invalid();
 	}
 }

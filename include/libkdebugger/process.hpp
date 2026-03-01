@@ -82,7 +82,8 @@ namespace kdebugger {
 			// attach to a currently running PID, return a static unique instance of ID
 			static std::unique_ptr<process> attach(const pid_t pid);
 
-			stop_reason wait_on_signal() const;
+			kdebugger::stop_reason step_instruction();
+			kdebugger::stop_reason wait_on_signal() const;
 			
 			// resume the current process if halted
 			void resume();

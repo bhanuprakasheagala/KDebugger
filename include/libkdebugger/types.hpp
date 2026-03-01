@@ -67,4 +67,38 @@ namespace kdebugger {
 				return m_Addr >= rhs.m_Addr;
 			}
 	};
+	
+	// span class for a pointer with a known length, similar to std::span
+	// however, this will need to be more specialized to take a view of memory address'
+	template <class T>
+	class span {
+		
+		private:
+			T* m_Data {nullptr};
+			std::size_t m_Size {0};
+		public:
+			// default constructor && overloads
+			span() = default;
+			span(T* data, std::size_t size) : m_Data {data}, m_Size {size} {}
+			span(T* data, T* end) : m_Data {data}, m_Size {end - data} {}
+		
+			template <class U>
+			span(const std::vector<U> & vec) : m_Data {vec.data()}, m_Size {vec.size()} {}
+
+			T* begin() const {
+				return m_Data;
+			}
+
+			T* end() const {
+				return m_Data + m_Size;
+			}
+
+			std::size_t size() {
+				return m_Size;
+			}
+
+			T & operator [](std::size_t n) noexcept {
+				return *(m_Data + n);
+			}
+	};
 }

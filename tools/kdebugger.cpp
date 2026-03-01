@@ -215,6 +215,24 @@ namespace {
 			
 			return;
 		}
+
+		if(args.size() < 3) {
+			print_help({"help", "breakpoint"});
+			return;
+		}
+
+		if(is_prefix(command, "set")) {
+			auto address = kdebugger::to_integral<std::uint64_t>(args[2], 16);
+			
+			if(!address) {
+				fmt::print(stderr, 
+					"Breakpoint command expects address in hex format, prefixed with 0x\n");
+				return;
+			}
+
+			process.create_breakpoint_site(kdebugger::virt_addr{*address}).enable();
+			return;
+		}
 	}
 }
 

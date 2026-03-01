@@ -84,6 +84,10 @@ namespace kdebugger {
 
 			kdebugger::stop_reason step_instruction();
 			kdebugger::stop_reason wait_on_signal() const;
+
+			// reading and writing to and from memory
+			std::vector<std::byte> read_memory(virt_addr address, size_t amount) const;
+			void write_memory(virt_addr address, span<const std::byte> data);
 			
 			// resume the current process if halted
 			void resume();

@@ -355,3 +355,32 @@ TEST_CASE("Can iterate breakpoint sites", "[breakpoint]") {
 		}
 	);
 }
+
+// in case - checking if a breakpoint on a given address works
+TEST_CASE("Breakpoint on address works", "[breakooint]") {
+	bool close_on_exec = false;
+	kdebugger::pipe channel(close_on_exec);
+
+	auto proc = process::launch("targets/hello_kdebugger", true, channel.get_write());
+	channel.close_write();
+
+	auto offset = get_entry_point_offset("targets/hello_kdebugger");
+	auto load_address = get_load_address(proc->pid(), offset);
+
+	proc->create_breakpoint_site(load_address).enable();
+	proc->resume();
+	auto reason = proc->wait_on_signal();
+
+	REQUIRE(reason.reason == process_state::stopped);
+	REQUIRE(reason.info == SIGTRAP);
+	REQUIRE(proc->get_pc() == load_address);
+
+	proc->resume();
+	reason = proc->wait_on_signal();
+
+	REQUIRE(reason.reason == process_state::exited);
+	REQUIRE(reason.info == 0);
+
+	auto data = channel.read();
+	REQUIRE(to_string_view(data) == "Hello, kdebugger!\n");
+}

@@ -106,4 +106,19 @@ namespace kdebugger {
 		-> typename points_t::const_iterator {
 		return const_cast<stoppoint_collection *>(this)->find_by_address(address);
 	}
+
+	template <class Stoppoint>
+	bool stoppoint_collection<Stoppoint>::contains_id(typename Stoppoint::id_type id) const {
+		return find_by_id(id) != end(m_Stoppoints)
+	}
+
+	template <class Stoppoint>
+	bool stoppoint_collection<Stoppoint>::contains_address(virt_addr address) const {
+		return find_by_address(address) != end(m_Stoppoints);
+	}
+
+	template <class Stoppoint>
+	bool stoppoint_collection<Stoppoint>::enabled_stoppoint_at_address(virt_addr address) const {
+		return contains_address(address) && get_by_address(address).is_enabled();
+	}
 }

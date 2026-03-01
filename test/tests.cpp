@@ -212,3 +212,35 @@ TEST_CASE("breakpoint site ids increase", "[breakpoint]") {
 	auto & s4 = proc->create_breakpoint_site(virt_addr{45});
 	REQUIRE((s4.address().addr() == 45);
 }
+
+TEST_CASE("Can find breakpoint site", "[breakpoint]") {
+	auto proc = process::launch("targets/run_endlessly");
+	const auto & cproc = proc;
+	
+	proc->create_breakpoint_site(virt_addr{42});
+	proc->create_breakpoint_site(virt_addr{43});
+	proc->create_breakpoint_site(virt_addr{44});
+	proc->create_breakpoint_site(virt_addr{45});
+	
+	// testing non-constness of our breakpoint sites
+	auto & s1 = proc->breakpoint_sites().get_by_address(virt_addr{44});
+	REQUIRE(proc->breakpoint_sites().contains_address(virt_addr{44}));
+	REQUIRE(s1.address().addr() == 44);
+	
+	// testing constness of our breakpoint sites
+	auto & cs1 = cproc->breakpoint_sites().get_by_address(virt_addr{44});
+	REQUIRE(cproc->breakpoint_sites().contains_address(virt_addr{45}));
+	REQUIRE(cs1.address().addr() == 44);
+	
+	// testing non-constness of our ids assigned to breakpoints
+	auto & s2 = proc->breakpoint_sites().get_by_id(s1.id() + 1);
+	REQUIRE(proc->breakpoint_sites().contains_id(s1.id() + 1));
+	REQUIRE(s2.id() == s1.id() + 1);
+	REQUIRE(s2.address().addr() == 45);
+
+	// testing constness of our ids assigned to constant breakpoints
+	auto & cs2 = proc->breakpoint_sites().get_by_id(cs1.id() + 1);
+	REQUIRE(cproc->breakpoint_sites().contains_id(cs1.id() + 1));
+	REQUIRE(cs2.id() == cs1.id() + 1);
+	REQUIRE(cs2.address().addr() == 45);
+}

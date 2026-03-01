@@ -244,3 +244,13 @@ TEST_CASE("Can find breakpoint site", "[breakpoint]") {
 	REQUIRE(cs2.id() == cs1.id() + 1);
 	REQUIRE(cs2.address().addr() == 45);
 }
+
+TEST_CASE("Cannot find breakpoint site", "[breakpoint]") {
+	auto proc = process::launch("targets/run_endlessly");
+	const auto & cproc = proc;
+
+	REQUIRE_THROW_AS(proc->breakpoint_sites().get_by_address(virt_addr{44}), error);
+	REQUIRE_THROW_AS(proc->breakpoint_sites().get_by_id(44), error);
+	REQUIRE_THROW_AS(cproc->breakpoint_sites().get_by_address(virt_addr{44}), error);
+	REQUIRE_THROW_AS(cproc->breakpoint_sites().get_by_id(44), error);
+}

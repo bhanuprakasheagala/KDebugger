@@ -213,6 +213,8 @@ TEST_CASE("breakpoint site ids increase", "[breakpoint]") {
 	REQUIRE((s4.address().addr() == 45);
 }
 
+// in case - a breakpoint site can be found and/or
+// has been successful to create
 TEST_CASE("Can find breakpoint site", "[breakpoint]") {
 	auto proc = process::launch("targets/run_endlessly");
 	const auto & cproc = proc;
@@ -245,6 +247,8 @@ TEST_CASE("Can find breakpoint site", "[breakpoint]") {
 	REQUIRE(cs2.address().addr() == 45);
 }
 
+// in case - if a breakpoint site could not be found and/or
+// has been unsuccessful in creation
 TEST_CASE("Cannot find breakpoint site", "[breakpoint]") {
 	auto proc = process::launch("targets/run_endlessly");
 	const auto & cproc = proc;
@@ -253,4 +257,26 @@ TEST_CASE("Cannot find breakpoint site", "[breakpoint]") {
 	REQUIRE_THROW_AS(proc->breakpoint_sites().get_by_id(44), error);
 	REQUIRE_THROW_AS(cproc->breakpoint_sites().get_by_address(virt_addr{44}), error);
 	REQUIRE_THROW_AS(cproc->breakpoint_sites().get_by_id(44), error);
+}
+
+TEST_CASE("Breakpoint site list size and emptiness", "[breakpoint]") {
+	auto proc = process::launch("targets/run_endlessly");
+	const auto & cproc = proc;
+
+	REQUIRE(proc->breakpoint_sites().empty());
+	REQUIRE(proc->breakpoint_sites().size() == 0);
+	REQUIRE(cproc->breakpoint_sites().empty());
+	REQUIRE(cproc->breakpoint_sites().size() == 0);
+	
+	proc->create_breakpoint_site(virt_addr{42});
+	REQUIRE(!proc->breakpoint_sites().empty());
+	REQUIRE(proc->breakpoint_sites().size() == 1);
+	REQUIRE(!cproc->breakpoint_site().empty());
+	REQUIRE(cproc->breakpoint_sites().size() == 1);
+	
+	proc->create_breakpoint_site(virt_addr{43});
+	REQUIRE(!proc->breakpoint_sites().empty());
+	REQUIRE(proc->breakpoint_sites().size() == 2);
+	REQUIRE(!cproc->breakpoint_sites().empty());
+	REQUIRE(cproc->breakpoint_sites().size() == 2);
 }

@@ -98,6 +98,11 @@ namespace kdebugger {
 				};
 			}
 
+			// helper function for setting the program counter
+			void set_pc(virt_addr address) {
+				get_registers().write_by_id(register_id::rip, address.addr());
+			}
+			
 			// iterating over breakpoint sites - returns memory location
 			breakpoint_site & create_breakpoint_site(virt_addr address);
 			

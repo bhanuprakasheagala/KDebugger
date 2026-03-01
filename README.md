@@ -77,8 +77,9 @@ project tree structure, to build:
 cd build && cmake ..
 ```
 
+In case VCPKG, encounters errors - boostrap it and run this in build.
 ```
-cmake .. -DCTOOL_CHAIN_USE
+cmake .. -DCMAKE_TOOLCHAIN_FILE=/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
 ```
 
 ```

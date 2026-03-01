@@ -2,6 +2,7 @@
 #include <sys/ptrace.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/personality>
 
 // Private / Project-specific headers
 #include <libkdebugger/process.hpp>
@@ -23,7 +24,7 @@ namespace {
 
 // launches a given process via a path
 std::unique_ptr<process> process::launch(const std::filesystem::path path, 
-		bool debug, std::optional<int> stdout_replacement) {
+				bool debug, std::optional<int> stdout_replacement) {
 	// set close_on_exec to be true --> pipe.hpp/pipe.cpp
 	pipe channel(true)
 
@@ -34,6 +35,7 @@ std::unique_ptr<process> process::launch(const std::filesystem::path path,
 
 	if(pid == 0) {
 		
+		personality(ADDR_NO_RANDOMIZE);
 		channel.close_read();
 
 		if(stdout_replacement()) {

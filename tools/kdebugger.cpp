@@ -35,15 +35,26 @@ namespace {
 		if(args.size() == 1) {
 			std::cerr << R"(Available Commands:
 				continue - Resume the process
+				breakpoint - Commands for operating on breakpoints
 				register - Commands for operating on registers)";
 		}
 
 		else if(is_prefix(args[1], "register")) {
-			std::cerr << R"(Available commands
+			std::cerr << R"(Available commands:
 				read
 				read <register_name>
 				read all
 				write <register_name> <value>)";
+		}
+
+		else if(is_prefix(args[1], "breakpoint")) {
+			std::cerr << R"(Available Commands:
+				list
+				delete <id>
+				disable <id>
+				enable <id>
+				set <address>
+			)";
 		}
 
 		else {

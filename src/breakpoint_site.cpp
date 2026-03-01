@@ -1,4 +1,10 @@
+// General header includes
+#include <sys/ptrace.h>
+
+// Private / project-specific headers
 #include <libkdebugger/breakpoint_site.hpp>
+#include <libkdebugger/process.hpp>
+#include <libkdebugger/error.hpp>
 
 namespace {
 	
@@ -8,7 +14,27 @@ namespace {
 	}
 }
 
+// private constructor definition
 kdebugger::breakpoint_site::breakpoint_site(process & proc, virt_addr address)
 	: m_Process {&proc}, m_Address {address}, m_isEnabled {false}, m_SavedData {} {
 	m_Id = get_next_id();
+}
+
+// replaces instruction with int3 instruction encoded as 0xcc
+void kdebugger::breakpoint_site::enable() {
+	if(m_isEnabled)
+		return;
+
+	errno = 0;
+	std::uint64_t data = ptrace(PTRACE_PEEKDATA, m_Process->pid(), m_Address, nullptr);
+	if(errno != 0)
+		error::send_errno("Enabling breakpoint site failed!\n");
+
+	m_SavedData = static_cast<std::byte>(data & 0xff);
+	std::uint64_t int3 = 0xcc;
+	std::uint64_t data_with_int3 = ((data & ~0xff) | int3);
+	if(ptrace(PTRACE_POKEDATA, m_Process->pid(), m_Address, data_with_int3) < 0)
+		error::send_errno("Enabling breakpoint site failed\n");
+
+	m_isEnabled = true;
 }

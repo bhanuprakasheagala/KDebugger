@@ -26,6 +26,7 @@
 #include <libkdebugger/process.hpp>
 #include <libkdebugger/error.hpp>
 
+// -- registers & print help ---
 namespace {
 
 	// Prints a help menu of commands for debugging
@@ -188,6 +189,35 @@ namespace {
 	}
 }
 
+// --- Breakpoints ---
+namespace {
+	
+	void handle_breakpoint_command(kdebugger::process & process, 
+		const std::vecotr<std::string> & args) {
+		if(args.size() < 2) {
+			print_help({"help", "breakpoint"});
+			return;
+		}
+
+		auto command = args[1];
+		if(is_prefix(command, "list")) {
+			if(process.breakpoint_sites().empty())
+				fmt::print("No Breakpoints set!\n");
+			else {
+				fmt::print("Current breakpoints:\n");
+				process.breakpoint_sites().for_each([] (auto & site) {
+					fmt::print("{}: address = {:#x}, {}\n", 
+						site.id(), site.address().addr(),
+						site.is_enabled() ? "enabled" : "disabled"
+					);
+				});
+			}
+			
+			return;
+		}
+	}
+}
+
 namespace {
 	
 	// will be properly ported to system tomorrow
@@ -288,6 +318,10 @@ namespace {
 
 		if(is_prefix(command, "help")) {
 			print_help();	
+		}
+
+		else if(is_prefix(command, "breakpoint")) {
+			handle_breakpoint_command(*process, args);
 		}
 
 		else {

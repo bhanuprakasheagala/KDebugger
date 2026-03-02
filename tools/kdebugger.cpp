@@ -29,6 +29,21 @@
 // -- handling memory commands --
 namespace {
 
+	// handles writing to memory
+	void handle_memory_write_command(kdebugger::process & process, const std::vector<std::string> & args) {
+		if(args.size() != 4) {
+			print_help({"help", "memory"});
+			return;
+		}
+
+		auto address = kdebugger::to_integral<std::uint64_t> (args[2], 16);
+		if(!address)
+			kdebugger::error::send("Invalid Address format");
+
+		auto data = kdebugger::parse_vector(args[3]);
+		process.write_memory(kdebugger::virt_addr {*address}, {data.data(), data.size()});
+	}
+
 	// handles reading memory
 	void handle_memory_read_command(kdebugger::process & process, const std::vector<std::string> & args) {
 		auto address = kdebugger::to_integral<std::uint64_t> (args[2], 16);

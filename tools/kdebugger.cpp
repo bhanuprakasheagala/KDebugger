@@ -79,6 +79,8 @@ namespace {
 				return;
 			}
 		}
+	
+		print_disassembly(process, address, n_instructions);
 	}
 }
 
@@ -152,11 +154,12 @@ namespace {
 	void print_help(const std::vector<std::string> & args) {
 		if(args.size() == 1) {
 			std::cerr << R"(Available Commands:
-				continue   - Resume the process
-				breakpoint - Commands for operating on breakpoints
-				memory     - Commands for operating on memory
-				register   - Commands for operating on registers
-				step 	   - steps over a single instruction)";
+				continue    - Resume the process
+				breakpoint  - Commands for operating on breakpoints
+				disassemble - Disassemble machine code to x64 assembly
+				memory      - Commands for operating on memory
+				register    - Commands for operating on registers
+				step 	    - steps over a single instruction)";
 		}
 
 		else if(is_prefix(args[1], "register")) {
@@ -182,6 +185,13 @@ namespace {
 				read <address>
 				read <address> <number-of-bytes>
 				write <address> <bytes>)";
+		}
+
+		else if(is_prefix(args[1], "disassemble")) {
+			std::cerr << R"(
+				-c <number of instructions>
+				-a <start address>
+			)";
 		}
 
 		else {

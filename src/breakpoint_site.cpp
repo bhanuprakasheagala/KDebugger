@@ -27,16 +27,21 @@ void kdebugger::breakpoint_site::enable() {
 	if(m_isEnabled)
 		return;
 
-	errno = 0;
-	std::uint64_t data = ptrace(PTRACE_PEEKDATA, m_Process->pid(), m_Address, nullptr);
-	if(errno != 0)
-		error::send_errno("Enabling breakpoint site failed!\n");
+	if(m_isHardware)
+		m_HardwareRegisterIndex = m_Process->set_hardware_breakpoint(m_Id, m_Address);
 
-	m_SavedData = static_cast<std::byte>(data & 0xff);
-	std::uint64_t int3 = 0xcc;
-	std::uint64_t data_with_int3 = ((data & ~0xff) | int3);
-	if(ptrace(PTRACE_POKEDATA, m_Process->pid(), m_Address, data_with_int3) < 0)
-		error::send_errno("Enabling breakpoint site failed\n");
+	else {
+		errno = 0;
+		std::uint64_t data = ptrace(PTRACE_PEEKDATA, m_Process->pid(), m_Address, nullptr);
+		if(errno != 0)
+			error::send_errno("Enabling breakpoint site failed!\n");
+
+		m_SavedData = static_cast<std::byte>(data & 0xff);
+		std::uint64_t int3 = 0xcc;
+		std::uint64_t data_with_int3 = ((data & ~0xff) | int3);
+		if(ptrace(PTRACE_POKEDATA, m_Process->pid(), m_Address, data_with_int3) < 0)
+			error::send_errno("Enabling breakpoint site failed\n");
+	}
 
 	m_isEnabled = true;
 }
@@ -46,14 +51,21 @@ void kdebugger::breakpoint_site::disable() {
 	if(!m_isEnabled)
 		return;
 
-	errno = 0;
-	std::uint64_t data = ptrace(PTRACE_PEEKDATA, m_Process->pid(), m_Address, nullptr);
-	if(errno != 0)
-		error::send_errno("Disabling breakpoint site failed\n");
+	if(m_isHardware) {
+		m_Process->clear_hardware_stoppoint(m_HardwareRegisterIndex);
+		m_HardwareRegisterIndex = -1;
+	}
+	
+	else {
+		errno = 0;
+		std::uint64_t data = ptrace(PTRACE_PEEKDATA, m_Process->pid(), m_Address, nullptr);
+		if(errno != 0)
+			error::send_errno("Disabling breakpoint site failed\n");
 
-	auto restored_data = ((data & ~0xff) | static_cast<std::uint8_t>(m_SavedData));
-	if(ptrace(PTRACE_POKEDATA, m_Process->pid(), m_Address, restored_data) < 0)
-		error::send_errno("Disabling breakpoint site failed\n");
+		auto restored_data = ((data & ~0xff) | static_cast<std::uint8_t>(m_SavedData));
+		if(ptrace(PTRACE_POKEDATA, m_Process->pid(), m_Address, restored_data) < 0)
+			error::send_errno("Disabling breakpoint site failed\n");
+	}
 
 	m_isEnabled = false;
 }

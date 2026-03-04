@@ -283,7 +283,7 @@ std::vector<std::byte> kdebugger::process::read_memory_without_traps(virt_addr a
 	auto sites = m_BreakPointSites.get_in_region(address, address + amount);
 
 	for(auto site : sites) {
-		if(!site->is_enabled())
+		if(!site->is_enabled() || site->is_hardware())
 			continue;
 
 		auto offset = site->address() - address.addr();

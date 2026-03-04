@@ -378,7 +378,15 @@ namespace {
 				return;
 			}
 
-			process.create_breakpoint_site(kdebugger::virt_addr{*address}).enable();
+			bool hardware = false;
+			if(args.size() == 4) {
+				if(args[3] == "-h")
+					hardware = true;
+				else
+					kdebugger::error::send("Invalid breakpoint command argument");
+			}
+
+			process.create_breakpoint_site(kdebugger::virt_addr{*address}, hardware).enable();
 			return;
 		}
 

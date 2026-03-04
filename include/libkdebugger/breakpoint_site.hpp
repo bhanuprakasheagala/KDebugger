@@ -14,13 +14,19 @@ namespace kdebugger {
 	class breakpoint_site {
 		
 		private:
-			breakpoint_site(process & proc, virt_addr address);
+			breakpoint_site(process & proc, virt_addr address. 
+						bool is_hardware = false, bool is_internal = false);
 			friend process;
 
-			std::uint32_t m_Id;
 			process * m_Process;
 			virt_addr m_Address;
+			std::uint32_t m_Id;
+			int m_HardwareRegisterIndex {-1};			
+
 			bool m_isEnabled;
+			bool m_isHardware;
+			bool m_isInternal;			
+
 			std::byte m_SavedData;
 
 		public:

@@ -14,7 +14,7 @@ std::vector<kdebugger::disassembler::instruction> kdebugger::disassembler::disas
 	if(!address)
 		address.emplace(m_Process->get_pc());
 
-	auto code = process->read_memory(*address, n_instructions * 15);
+	auto code = process->read_memory_without_traps(*address, n_instructions * 15);
 
 	ZyanUSize offset = 0;
 	ZydisDisassembledInstruction instr;

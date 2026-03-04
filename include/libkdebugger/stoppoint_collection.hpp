@@ -40,7 +40,9 @@ namespace kdebugger {
 			Stoppoint & get_by_id(typename Stoppoint::id_type id);
 			const Stoppoint & get_by_id(typename Stoppoint::id_type id) const;
 		
-			
+			// get in region for replacing int3 instructions in each breakpoint site
+			std::vector<Stoppoint *> get_in_region(virt_addr low, virt_addr high) const;
+				
 			Stoppoint & get_by_address(virt_addr address);
 			const Stoppoint & get_by_address(virt_addr address) const;
 
@@ -181,5 +183,16 @@ namespace kdebugger {
 		for(const auto & point : m_Stoppoints) {
 			idx(*point);
 		}		
+	}
+
+	template <class Stoppoint>
+	std::vector<Stoppoint *> stoppoint_collection::get_in_region(virt_addr low, virt_addr high) const {
+		std::vector<Stoppoint *> ret;
+		for(auto & site : m_Stoppoints) {
+			if(site->in_range(low, high))
+				ret.push_back(&(*site));
+		}
+	
+		return ret;
 	}
 }

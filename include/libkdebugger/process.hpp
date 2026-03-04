@@ -86,7 +86,10 @@ namespace kdebugger {
 			kdebugger::stop_reason wait_on_signal() const;
 
 			// reading and writing to and from memory
-			std::vector<std::byte> read_memory(virt_addr address, size_t amount) const;
+			std::vector<std::byte> read_memory(virt_addr address, std::size_t amount) const;
+			// reads memory then fix a replacement for int3 instructions with original bytes
+			std::vector<std::byte> read_memory_without_traps(virt_addr, std::size_t amount) const;
+		
 			void write_memory(virt_addr address, span<const std::byte> data);
 			
 			// read memory as a certain size

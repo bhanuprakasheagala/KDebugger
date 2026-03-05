@@ -315,4 +315,32 @@ void kdebugger::process::write_memory(virt_addr address, span<const std::byte> d
 
 		written += 8;
 	}
-}	
+}
+
+int kdebugger::process::set_hardware_breakpoint(breakpoint_site::id_type id, virt_addr address) {
+    return set_hardware_stoppoint(address, stoppoint_mode::execute, 1);
+}
+
+int kdebugger::process::set_hardware_stoppoint(virt_addr address, stoppoint_mode mode, std::size_t size) {
+    auto & regs = get_registers();
+    auto control = regs.read_by_id_as<std::uint64_t>(register_id::dr7);
+
+    int free_space = find_free_stoppoint_register(control);
+    auto id = static_cast<int>(register_id::dr0) + free_space;
+    regs.write_by_id(static_cast<register_id>(id), address.addr());
+
+    auto mode_flag = encode_hardware_stoppoint_mode(mode);
+    auto size_flag = encode_hardware_stoppoint_size(size);
+
+    auto enable_bit = (1 << (free_space * 2));
+    auto mode_bits = (mode_flag << (free_space * 4 + 16));
+    auto size_bits = (size_flag << (free_space * 4 + 18));
+
+    auto clear_mask = (0b11 << (free_space * 2)) | (0b1111 << (free_space * 4 + 16));
+    auto masked = control & ~clear_mask;
+
+    masked |= enable_bit | mode_bits | size_bits;
+
+    regs.write_by_id(register_id::dr7, masked);
+    return free_space;
+}

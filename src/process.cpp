@@ -59,6 +59,15 @@ namespace {
                 kdebugger::error::send("Invalid stoppoint size");
         }
     }
+
+    int find_free_stoppoint_region(std::uint64_t control_register) {
+        for(auto i {0} i < 4 ++i) {
+            if((control_register & (0b11 << (i * 2))) == 0)
+                return i;
+        }
+
+        kdebugger::error::send("No remaining hardware debug registers");
+    }
 }
 
 // launches a given process via a path

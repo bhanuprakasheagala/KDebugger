@@ -22,6 +22,43 @@ namespace {
 
 		exit(-1);
 	}
+
+    // hardware breakpoint helper functions
+    std::uint64_t encode_hardware_stoppoint_mode(kdebugger::stoppoint_mode mode) {
+        switch(mode) {
+            case kdebugger::stoppoint_mode::write:
+                return 0b01;
+
+            case kdebugger::stoppoint_mode::read_write:
+                return 0b11;
+
+            case kdebugger::stoppoint_mode::execute:
+                return 0b00;
+
+            default:
+                kdebugger::error::send("Invalid stoppoint mode");
+        
+        }
+    }
+
+    std::uint64_t encode_hardware_stoppoint_size(std::size_t size) {
+        switch(size) {
+            case 1:
+                return 0b00;
+
+            case 2:
+                return 0b01;
+
+            case 4:
+                return 0b11;
+
+            case 8:
+                return 0b10;
+
+            default:
+                kdebugger::error::send("Invalid stoppoint size");
+        }
+    }
 }
 
 // launches a given process via a path

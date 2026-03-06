@@ -406,3 +406,13 @@ int kdebugger::process::set_watchpoint(watchpoint::id_type id, virt_addr address
         std::size_t size) {
     return set_hardware_stoppoint(address, mode, size);
 }
+
+kdebugger::watchpoint & kdebugger::process::create_watchpoint(cirt_addr address, stoppoint_mode mode, 
+        std::size_t size) {
+    if(m_Watchpoints.contains_address(address)) {
+        error::send("Watchpoint already created at address " 
+                + std::to_string(address.addr()));
+    }
+
+    return m_Watchpoints.push(std::unique_ptr<watchpoint>(new watchpoint(*this, address, mode, size)));
+}

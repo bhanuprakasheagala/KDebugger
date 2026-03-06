@@ -401,3 +401,8 @@ void kdebugger::process::clear_hardware_stoppoint(int index) {
 
     get_registers().write_by_id(register_id::dr7, masked);
 }
+
+int kdebugger::process::set_watchpoint(watchpoint::id_type id, virt_addr address, stoppoint_mode mode, 
+        std::size_t size) {
+    return set_hardware_stoppoint(address, mode, size);
+}

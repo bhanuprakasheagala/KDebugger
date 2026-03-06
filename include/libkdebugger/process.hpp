@@ -23,6 +23,12 @@ namespace kdebugger {
 		terminated
 	};
 
+    enum class stoppoint_mode {
+        write,
+        read_write,
+        execute
+    };
+
 	struct stop_reason {
 		
 		stop_reason(int wait_status);
@@ -55,7 +61,7 @@ namespace kdebugger {
 			       		m_Registers {new registers(*this)} {}
 
             // private method for setting hardware breakpoints
-            int set_hardware_stoppoint(virt_addr address, mode, std::size_t size);
+            int set_hardware_stoppoint(virt_addr address, stoppoint_mode mode, std::size_t size);
 
 		public:
 			// delete default constructor
@@ -94,7 +100,10 @@ namespace kdebugger {
 			std::vector<std::byte> read_memory_without_traps(virt_addr, std::size_t amount) const;
 		
 			void write_memory(virt_addr address, span<const std::byte> data);
-			
+		
+            // clears a hardware stoppoint
+            void clear_hardware_stoppoint(int index);
+
 			// read memory as a certain size
 			template <class T> T read_memory_as(virt_addr address) const {
 				auto data = read_memory(address, sizeof(T));

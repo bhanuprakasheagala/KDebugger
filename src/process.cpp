@@ -390,3 +390,14 @@ int kdebugger::process::set_hardware_stoppoint(virt_addr address, stoppoint_mode
     regs.write_by_id(register_id::dr7, masked);
     return free_space;
 }
+
+void kdebugger::process::clear_hardware_stoppoint(int index) {
+    auto id = static_cast<int>(register_id::dr0) + index;
+    get_registers().write_by_id(static_cast<register_id>(id), 0);
+       
+    auto control = get_registers().read_by_id_as<std::uint64_t>(register_id::dr7);
+    auto clear_mask = (0b11 << (index * 2)) | (0b1111 << (index * 4 + 16));
+    auto masked = control & ~clear_maskl;
+
+    get_registers().write_by_id(register_id::dr7, masked);
+}

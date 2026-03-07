@@ -14,7 +14,17 @@
 #include <libkdebugger/stoppoint_collection.hpp>
 
 namespace kdebugger {
-    
+
+    struct syscall_information {
+        std::uint16_t id;
+        bool entry;
+
+        union {
+            std::array<std::uint64_t, 6> args;
+            std::int64_t ret;
+        };
+    };
+
     // class for catchpoints invoked when a syscall
     // is encountered
     class syscall_catch_policy {

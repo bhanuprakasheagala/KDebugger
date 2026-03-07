@@ -74,7 +74,7 @@ given branches for people to see how these conversions work
 └── vcpkg.json
 ```
 # Scope
-> [[!NOTE]]
+> [!NOTE]
 > Features with ⚠️ are either in-development or have yet to be added
 1. A Basice Debugger Capable of interacting with Process ✅
 2. Provides User with Memory Address Locations and single-stepping ✅

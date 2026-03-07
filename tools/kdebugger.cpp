@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <sstream>
 #include <memory>
+#include <csignal>
 
 // formatting options - will refactor to standard 20 usage
 // after build completion
@@ -27,6 +28,16 @@
 #include <libkdebugger/error.hpp>
 #include <libkdebugger/disassembler.hpp>
 
+// -- signal handling --
+namespace {
+    kdebugger::process * g_KdebuggerProcess {nullptr};
+
+    void handle_sigint(int) {
+        kill(g_KdebuggerProcess->pid(), SIGSTOP);
+    }
+}
+
+// -- handling watchpoints --
 namespace {
 
     void handle_watchpoint_set(kdebugger::process & process, const std::vector<std::string> & args) {
@@ -710,7 +721,9 @@ int main(int argc, const char** argv) {
 
 	try {
 		auto process = attach(argc, argv);
-		main_loop(process);
+	    g_KdebuggerProcess = process.get();
+        signal(SIGINT, handle_sigint);
+        main_loop(process);
 	}
 
 	catch (const kdebugger::error & err) {

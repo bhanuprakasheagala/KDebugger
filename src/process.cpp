@@ -203,8 +203,19 @@ kdebugger::stop_reason kdebugger::process::wait_on_signal() {
 		augment_stop_reason(reason);
 
 		auto instr_begin = get_pc() - 1;
-		if(reason.info == SIGTRAP && m_BreakPointSites.enabled_stoppoint_at_address(instr_begin))
-			set_pc(instr_begin)
+		if(reason.info == SIGTRAP) {
+            if(reason.trap_reason == trap_type::software_break 
+                                  && m_BreakPointSites.contains_address(instr_begin)
+                                  && m_BreakPointSites.get_by_address(instr_begin).is_enabled()) {
+			set_pc(instr_begin);
+        }
+
+        else if(reason.trap_reason == trap_type::hardware_break) {
+            auto id = get_current_hardware_stoppoint();
+
+            if(id.index == 1)
+                m_WatchPoints.get_by_id(std::get<1>(id)).update_data();
+        }
 	}
 
 	return reason;

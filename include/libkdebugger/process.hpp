@@ -85,17 +85,19 @@ namespace kdebugger {
         single_step,
         software_break,
         hardware_break,
-        unkown
+        syscall,
+        unkown,
     };
 
 	struct stop_reason {
 		
 		stop_reason(int wait_status);
 
+        std::uint8_t info;
 		process_state reason;
         std::optional<trap_type> trap_reason;
-		std::uint8_t info;
-	};
+	    std::optional<syscall_information> syscall_info;
+    };
 
 	class process {
 		
@@ -104,7 +106,9 @@ namespace kdebugger {
 			bool m_Terminate {true};
 			bool m_Attached {true};
 			process_state m_State {process_state::stopped};
-			
+	
+            bool expecting_syscall_exit {false};
+
 			void read_all_registers() const;
 
 			// holds the address of our registers

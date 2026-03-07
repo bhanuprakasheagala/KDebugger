@@ -447,3 +447,25 @@ void kdebugger::process::augment_stop_reason(stop_reason & reason) {
         }
     }
 }
+
+std::variant<kdebugger::breakpoint_site::id_type, kdebugger::watchpoint::id_type>
+kdebugger::process::get_current_hardware_stoppoint() const {
+    auto & regs = get_registers();
+    auto status = regs.read_by_id_as<std::uint64_t>(register_id::dr6);
+    auto index = __builtin_ctzll(status);
+
+    auto id = static_cast<int>(register_id::dr0) + index;
+    auto addr = virt_addr(regs.read_by_id_as<std::uint64_t>(static_cast<register_id>(id)));
+
+    using ret = std::variant<kdebugger::breakpoint_site::id_type, kdebugger::watchpoint::id_type>;
+
+    if(m_BreakPointSites.contains_address(addr)) {
+        auto site_id = m_BreakPointSites.get_by_address(addr).id();
+        return ret {std::in_place_index<0>, site_id};
+    }
+
+    else {
+        auto watch_id = m_WatchPoints.get_by_address(addr).id();
+        return ret {std::in_place_index<1>, watch_id};
+    }
+}

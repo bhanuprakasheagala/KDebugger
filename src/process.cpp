@@ -82,7 +82,10 @@ std::unique_ptr<process> process::launch(const std::filesystem::path path,
 	}
 
 	if(pid == 0) {
-		
+
+        if(setpgid(0, 0) < 0)
+            exit_with_perror(channel, "Could not set pgid");
+            
 		personality(ADDR_NO_RANDOMIZE);
 		channel.close_read();
 
@@ -367,6 +370,7 @@ int kdebugger::process::set_hardware_breakpoint(breakpoint_site::id_type id, vir
     return set_hardware_stoppoint(address, stoppoint_mode::execute, 1);
 }
 
+// sets a hardware breakpoint
 int kdebugger::process::set_hardware_stoppoint(virt_addr address, stoppoint_mode mode, std::size_t size) {
     auto & regs = get_registers();
     auto control = regs.read_by_id_as<std::uint64_t>(register_id::dr7);
@@ -391,6 +395,7 @@ int kdebugger::process::set_hardware_stoppoint(virt_addr address, stoppoint_mode
     return free_space;
 }
 
+// clears a hardware breakpoint
 void kdebugger::process::clear_hardware_stoppoint(int index) {
     auto id = static_cast<int>(register_id::dr0) + index;
     get_registers().write_by_id(static_cast<register_id>(id), 0);
@@ -402,11 +407,13 @@ void kdebugger::process::clear_hardware_stoppoint(int index) {
     get_registers().write_by_id(register_id::dr7, masked);
 }
 
+// sets a watchpoint as a hardware breakpoint
 int kdebugger::process::set_watchpoint(watchpoint::id_type id, virt_addr address, stoppoint_mode mode, 
         std::size_t size) {
     return set_hardware_stoppoint(address, mode, size);
 }
 
+// creates a new watchpoint at a given address with either w/rw/rw+
 kdebugger::watchpoint & kdebugger::process::create_watchpoint(cirt_addr address, stoppoint_mode mode, 
         std::size_t size) {
     if(m_Watchpoints.contains_address(address)) {

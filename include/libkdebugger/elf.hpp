@@ -3,6 +3,13 @@
 // General include paths
 #include <filesystem>
 #include <elf.h>
+#include <vector>
+#include <string_view>
+#include <unordered_map>
+#include <optional>
+
+// Project specific / private include paths
+#include <libkdebugger/types.hpp>
 
 namespace kdebugger {
 	// defines the ELF specification we can use to parse executables,
@@ -22,6 +29,12 @@ namespace kdebugger {
 			// parses individual section headers encountered
 			void parse_section_headers();
 
+			// builds a section map in virtual memory
+			void build_section_map();
+
+			// contains the section map along with given Elf64 section headers
+			std::unordered_map<std::string_view, Elf64_Shdr *> m_SectionMap;
+
 		public:
 			elf(const std::filesystem::path & path);
 		
@@ -36,6 +49,15 @@ namespace kdebugger {
 			const Elf64_Ehdr & get_header() const {
 				return m_Header;
 			}
+
+			// gets section name in the elf binary
+			std::string_view get_section_name(std::size_t index) const;
+
+			// returns an Elf64 section header which we are looking at
+			std::optional<const Elf64_Shdr *> get_section(std::string_view name) const;
+
+			// returns a span of the contents and an observed section
+			span<const std::byte> get_section_contents(std::string_view name) const;
 
 			~elf();
 	}

@@ -99,6 +99,22 @@ namespace {
         if(reason.trap_reason == kdebugger::trap_type::single_step)
             return "(single step)";
 
+        if(reason.trap_reason == kdebugger::trap_type::syscall) {
+            const auto & info = *reason.syscall_info;
+            std::string message = "";
+
+            if(info.entry) {
+                message += "(syscall entry)\n";
+                message += fmt::format("syscall: {} ({:#x})", kdebugger::syscall_id_to_name(info.id),
+                        fmt::join(info.args, ","));
+            } else {
+                message += "(syscall exit)\n";
+                message += fmt::format("syscall returned: {:#x}", info.ret);
+            }
+
+            return message;
+        }
+
         return "";
     }
 }

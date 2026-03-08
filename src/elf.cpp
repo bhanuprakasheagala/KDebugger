@@ -32,6 +32,7 @@ kdebugger::elf::elf(const std::filesystem::path & path) {
 	std::copy(m_Data + sizeof(header), as_byes(m_Header));
 
 	parse_section_headers();
+	build_section_map();
 }
 
 void kdebugger::elf::parse_section_headers() {
@@ -51,6 +52,19 @@ std::string_view kdebugger::elf::get_section_name(std::size_t index) const {
 	return {
 		reinterpret_cast<char*>(m_Data) + section.sh_offset + index
 	};
+}
+
+void kdebugger::elf::build_section_map() {
+	for(auto & section : m_SectionHeaders) {
+		m_SectionMap[get_section_name(section.sh_name)] = &section;
+	}
+}
+
+std::optional<const Elf64_Shdr *> kdebugger::elf::get_section(std::string_view name) const {
+	if(m_SectionMap.count(name) == 0)
+		return std::nullopt;
+
+	return m_SectionMap.at(name);
 }
 
 kdebugger::elf::~elf() {

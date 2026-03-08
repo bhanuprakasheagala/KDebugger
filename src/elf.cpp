@@ -75,6 +75,21 @@ std::optional<const Elf64_Shdr *> kdebugger::elf::get_section(std::string_view n
 	return m_SectionMap.at(name);
 }
 
+std::string_view kdebugger::elf::get_string(std::size_t index) const {
+	auto opt_strtab = get_section(".strtab");
+	
+	if(!opt_strtab) {
+		opt_strtab = get_section(".dynstr");
+		
+		if(!opt_strtab)
+			return "";
+	}
+
+	return {
+		reinterpret_cast<char *>(m_Data) + opt_strtab.value()->sh_offset + index
+	};
+}
+
 kdebugger::elf::~elf() {
 	munmap(m_Data, m_FileSize);
 	close(m_Fd);

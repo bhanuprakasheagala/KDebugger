@@ -16,6 +16,12 @@ namespace kdebugger {
 			std::byte * m_Data;
 			Elf64_Ehdr m_Header;
 
+			// a vector of section headers
+			std::vector<Elf64_Shdr> m_SectionHeaders;
+
+			// parses individual section headers encountered
+			void parse_section_headers();
+
 		public:
 			elf(const std::filesystem::path & path);
 		

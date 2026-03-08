@@ -30,6 +30,17 @@ kdebugger::elf::elf(const std::filesystem::path & path) {
 
 	m_Data = reinterpret_cast<std::byte*>(ret);
 	std::copy(m_Data + sizeof(header), as_byes(m_Header));
+
+	parse_section_headers();
+}
+
+void kdebugger::elf::parse_section_headers() {
+	m_SectionHeaders.resize(m_Header.e_shnum);
+
+	std::copy(
+		m_Data + m_Header.e_shoff, m_Data + m_Header.e_shoff + sizeof(Elf64_shr) * m_Header.e_shnum,
+		reinterpret_cast<std::byte*>(m_SectionHeaders.data());
+	);
 }
 
 kdebugger::elf::~elf() {

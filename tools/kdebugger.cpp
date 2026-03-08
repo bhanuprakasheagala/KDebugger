@@ -331,6 +331,7 @@ namespace {
 				register    - Commands for operating on registers
 				step 	    - steps over a single instruction
                 watchpoint  - commands for operating on watchpoints
+                catchpoint  - commands for operating on catchpoints
             )";
 		}
 
@@ -367,7 +368,7 @@ namespace {
 		}
 
         else if(is_prefix(args[1], "watchpoint")) {
-            std::cerr R"(
+            std::cerr << R"(
                 list
                 delete <id>
                 disable <id>
@@ -376,6 +377,14 @@ namespace {
             )";
         }
 
+        else if(is_prefix(args[1], "catchpoint")) {
+            std::cerr << R"(
+                syscall
+                syscall none
+                syscall <list of names or IDs>
+            )";
+        }
+    
 		else {
 			std::cerr << "No help available!\n";
 		}

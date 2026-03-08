@@ -178,4 +178,24 @@ namespace kdebugger {
 				return m_Addr >= other.m_Addr;
 			}
 	};
+
+	class file_offset {
+		
+		private:
+			const elf * m_Elf = nullptr;
+			std::uint64_t m_Offset {0};`
+
+		public:
+			file_offset() = delete;
+
+			file_offset(const elf & obj, std::uint64_t offset) : m_Elf{obj}, m_Offset{offset} {}
+
+			std::uint64_t off() const {
+				return m_Offset;
+			}
+
+			const elf * elf_file() const {
+				return m_Elf;
+			}
+	};
 }

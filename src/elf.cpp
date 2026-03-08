@@ -46,6 +46,13 @@ void kdebugger::elf::parse_section_headers() {
 	);
 }
 
+std::string_view kdebugger::elf::get_section_name(std::size_t index) const {
+	auto & section = m_SectionHeader[m_Header.e_shstrndx];
+	return {
+		reinterpret_cast<char*>(m_Data) + section.sh_offset + index
+	};
+}
+
 kdebugger::elf::~elf() {
 	munmap(m_Data, m_FileSize);
 	close(m_Fd);

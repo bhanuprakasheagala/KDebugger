@@ -228,6 +228,10 @@ kdebugger::stop_reason kdebugger::process::wait_on_signal() {
             if(id.index == 1)
                 m_WatchPoints.get_by_id(std::get<1>(id)).update_data();
         }
+
+        else if(reason.trap_reason == trap_type::syscall) {
+            reason = mabye_resume_from_syscall(reason);
+        }
 	}
 
 	return reason;

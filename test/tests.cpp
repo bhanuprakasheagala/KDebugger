@@ -8,6 +8,7 @@
 #include <libkdebugger/process.hpp>
 #include <libkdebugger/pipe.hpp>
 #include <libkdebugger/bit.hpp>
+#include <libkdebugger/syscalls.hpp>
 
 using namespace kdebugger;
 
@@ -493,4 +494,13 @@ TEST_CASE("Watchpoint detects read", "[watchpoint]") {
     proc->wait_on_signal();
 
     REQUIRE(to_string_view(channel.read()) == "Putting pineapple on pizza");
+}
+
+// in case - check the syscalls.inc and stringifcation
+// of ids and names works in our map
+TEST_CASE("Syscall mapping works", "[syscall]") {
+	REQUIRE(kdebugger::syscall_id_to_name(0) == "read");
+	REQUIRE(kdebugger::syscall_name_to_id("read") == 0);
+	REQUIRE(kdebugger::syscall_id_to_name(62) == "kill");
+	REQUIRE(kdebugger::syscall_name_to_id("kill") == 62);
 }

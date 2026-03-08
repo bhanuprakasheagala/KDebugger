@@ -467,6 +467,20 @@ void kdebugger::process::augment_stop_reason(stop_reason & reason) {
 
         else {
             // handle entry
+            sys_info.entry = true;
+            sys_info.id = regs.read_by_id_as<std::uint64_t>(register_id::orig_rax);
+
+            // from SYSV ABI, syscall arguments and stored in these registers
+            std::array<register_id, 6> args_regs = {
+                register_id::rdi, register_id::rsi, register_id::rdx,
+                register_id::r10, register_id::r8, register_id::r9
+            };
+
+            for(auto i {0}; i < 6; ++i) {
+                sys_info.args[i] = regs.read_by_id_as<std::uint64_t>(args_regs[i]);
+            }
+
+            expecting_syscall_exit = true;
         }
 
         reason.info = SIGTRAP;

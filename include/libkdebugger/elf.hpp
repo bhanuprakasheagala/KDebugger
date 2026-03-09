@@ -74,6 +74,9 @@ namespace kdebugger {
 			void notify_loaded(virt_addr address) {
 				m_LoadBias = address;
 			}
+	
+			const Elf64_Shdr * get_section_containing_address(file_addr addr) const;
+			const Elf64_Shdr * get_section_containing_address(virt_addr addr) const;
 
 			~elf();
 	}

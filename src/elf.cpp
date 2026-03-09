@@ -90,6 +90,28 @@ std::string_view kdebugger::elf::get_string(std::size_t index) const {
 	};
 }
 
+const Elf64_Shr * kdebugger::elf::get_section_containing_address(file_addr addr) const {
+	if(addr.elf_file() != this)
+		return nullptr;
+
+	for(auto & section : m_SectionHeader) {
+		if(section.sh_addr <= addr.addr() && section.sh_addr + section.sh_size > addr.addr())
+			return &section;
+	}
+
+	return nullptr;
+}
+
+// overload that takes a virtual address over a file address offset
+const Elf64_Shr * kdebugger::elf::get_section_containing_address(virt_addr addr) const {
+	for(auto & section : m_SectionHeaders) {
+		if(m_LoadBias + section.sh_addr <= addr && m_LoadBias + section.sh_addr + section.sh_size > addr)
+			return &section;
+	}
+
+	return nullptr;
+}
+
 kdebugger::elf::~elf() {
 	munmap(m_Data, m_FileSize);
 	close(m_Fd);

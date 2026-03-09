@@ -208,6 +208,10 @@ std::optional<const Elf64_Sym *> kdebugger::elf::get_symbol_containing_address(f
 	return std::nullopt;
 }
 
+std::optional<const Elf64_Sym *> kdebugger::elf::get_symbol_containing_address(virt_addr address) const {
+	return get_symbol_containing_address(address.to_file_addr(*this));
+}
+
 kdebugger::elf::~elf() {
 	munmap(m_Data, m_FileSize);
 	close(m_Fd);

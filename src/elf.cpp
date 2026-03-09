@@ -33,6 +33,7 @@ kdebugger::elf::elf(const std::filesystem::path & path) {
 
 	parse_section_headers();
 	build_section_map();
+	parse_symbol_table();
 }
 
 void kdebugger::elf::parse_section_headers() {
@@ -117,6 +118,22 @@ std::optional<kdebugger::file_addr> kdebugger::elf::get_section_start_address(st
 		return file_addr {*this, sect.value()->sh_addr};
 
 	return std::nullopt;
+}
+
+void kdebugger::elf::parse_symbol_table() {
+	auto opt_symtab = get_section(".symtab");
+
+	if(!opt_symtab) {
+		opt_symtab = get_section(".dynsym");
+
+		if(!opt_symtab)
+			return;
+	}
+
+	auto symtab = *opt_symtab;
+	m_SymbolTable.resize(symtab->sh_size / symtab->sh_entsize);
+	std::copy(m_Data + symtab->sh_offset, m_Data + symtab->sh_offset + symtab->sh_size,
+			reinterpret_cast<std::byte*>(m_SymbolTable.data()));
 }
 
 kdebugger::elf::~elf() {

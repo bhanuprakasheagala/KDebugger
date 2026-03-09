@@ -26,6 +26,11 @@ namespace kdebugger {
 			// load bias stored here
 			virt_addr m_LoadBias
 
+			// a vector of symbols parsed from the elf symbol table
+			// holds the size of the entity, category of said entity
+			// and whether its available for other ELF files to link with
+			std::vector<Elf64_Sym> m_SymbolTable;
+
 			// a vector of section headers
 			std::vector<Elf64_Shdr> m_SectionHeaders;
 
@@ -41,6 +46,9 @@ namespace kdebugger {
 			// gets a string from the string table at a given index
 			// i.e from .strtab or .dynstr (abbreviated section)
 			std::string_view get_string(std::size_t index) const;
+
+			// function for parsing .symtab
+			void parse_symbol_table();
 
 		public:
 			elf(const std::filesystem::path & path);

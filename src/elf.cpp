@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <cxxabi.h>
+
 // Private / project specific headers
 #include <libkdebugger/elf.hpp>
 #include <libkdebugger/error.hpp>
@@ -34,6 +36,7 @@ kdebugger::elf::elf(const std::filesystem::path & path) {
 	parse_section_headers();
 	build_section_map();
 	parse_symbol_table();
+	build_symbol_maps();
 }
 
 void kdebugger::elf::parse_section_headers() {
@@ -134,6 +137,27 @@ void kdebugger::elf::parse_symbol_table() {
 	m_SymbolTable.resize(symtab->sh_size / symtab->sh_entsize);
 	std::copy(m_Data + symtab->sh_offset, m_Data + symtab->sh_offset + symtab->sh_size,
 			reinterpret_cast<std::byte*>(m_SymbolTable.data()));
+}
+
+void kdebugger::elf::build_symbol_maps() {
+	for(auto & symbol : m_SymbolTable) {
+		auto mangled_name = get_string(symbol.st_name);
+		int demangled_status;
+		auto demangled_name = abi::__cxa_demangle(mangled_name.data(), nullptr, nullptr, &demangle_status);
+
+		if(demangled_status == 0) {
+			m_SymbolNameMap.insert({demangled_name, &symbol});
+			free(demangled_name);
+		}
+
+		m_SymbolNameMap.insert({mangled_name, &symbol});
+
+		if(symbol.st_value != 0 && symbol.st_name != 0 && ELF64_ST_TYPE(symbol.st_info) != STT_TLS) {
+			auto addr_range = std::pair(file_addr{*this, symbol.st_value}, file_addr{*this, symbol.st_value + symbol.st_size});
+
+			m_SymbolAddrMap.insert({addr_range, &symbol});
+		}
+	}
 }
 
 kdebugger::elf::~elf() {

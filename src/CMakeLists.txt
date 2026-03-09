@@ -8,6 +8,7 @@ add_library(libkdebugger ... watchpoint.cpp)
 add_library(libkdebugger ... syscalls.cpp)
 add_library(libkdebugger ... elf.cpp)
 add_library(libkdebugger ... types.cpp)
+add_library(libkdebugger ... targets.cpp)
 
 # I will end up building my own after this to draw away from
 # external dependencies like Zydis

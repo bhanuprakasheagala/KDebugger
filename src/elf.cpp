@@ -160,6 +160,17 @@ void kdebugger::elf::build_symbol_maps() {
 	}
 }
 
+std::vector<const Elf64_Sym *> kdebugger::elf::get_symbols_by_name(std::string_view name) const {
+	auto [begin, end] = m_SymbolNameMap.equal_range(name);
+
+	std::vector<const Elf64_Sym *> ret;
+	std::transform(begin, end, std::back_inserter(ret), [](auto & pair) {
+		return pair.second;
+	});
+
+	return ret;
+}
+
 kdebugger::elf::~elf() {
 	munmap(m_Data, m_FileSize);
 	close(m_Fd);

@@ -90,5 +90,13 @@ namespace kdebugger {
 			std::int64_t s64() {
 				return fixed_int<std::int64_t>();
 			}
+	
+			std::string_view string() {
+				auto null_terminator = std::find(m_Pos, m_Data.end(), std::byte{0});
+				std::string_view ret(reinterpret_cast<const char *>(m_Pos));
+
+				m_Pos = null_terminator + 1;
+				return ret;
+			}
 	};
 };

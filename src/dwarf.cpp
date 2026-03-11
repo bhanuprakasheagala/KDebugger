@@ -62,3 +62,25 @@ std::vector<std::unique_ptr<compile_unit>> parse_compile_units(kdebugger::dwarf 
 
 	return units;
 }
+
+std::unique_ptr<kdebugger::compile_unit> parse_compile_unit(kdebugger::dwarf & dwarf, const kdebugger::elf & elf, cursor cur) {
+	auto start = cur.position();
+	auto size = cur.u32();
+	auto version = cur.u16();
+	auto abbrev = cur.u32();
+	auto address_size = cur.u8();
+
+	if(size == 0xffffffff)
+		kdebugger::error::send("Only DWARF32 is supported at this moment.");
+
+	if(version != 4)
+		kdebugger::error::send("Only DWARF version 4 is supported");
+
+	if(address_size != 8)
+		kdebugger::error::send("Invalid address size for DWARF");
+
+	size += sizeof(std::uint32_t);
+
+	kdebugger::span<const std::byte> data = {start, size};
+	return std::make_unique<kdebugger::compile_unit>(dwarf, data, abbrev);
+}

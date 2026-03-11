@@ -39,3 +39,7 @@ std::unordered_map<std::uint64_t, kdebugger::abbrev> parse_abbrev_table(const kd
 
 	return table;
 }
+
+const std::unordered_map<std::uint64_t, kdebugger::abbrev> & kdebugger::compile_unit::abbrev_table() const {
+	returb=n m_Parent->get_abbrev_table(m_AbbrevOffset);
+}

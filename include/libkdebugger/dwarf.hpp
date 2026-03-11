@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <cstdint>
+#include <memory>
 
 // I will implement this later... whole lotta constants lmao
 #include <libkdebugger/detail/dwarf.h>

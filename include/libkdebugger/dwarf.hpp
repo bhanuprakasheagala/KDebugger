@@ -1,6 +1,8 @@
 #pragma once
 
 #include <unordered_map>
+#include <vector>
+#include <cstdint>
 
 // I will implement this later... whole lotta constants lmao
 #include <libkdebugger/detail/dwarf.h>
@@ -134,4 +136,21 @@ namespace kdebugger {
 				return res;
 			}
 	};
-};
+}
+
+namespace kdebugger {
+	
+	// abbreviation table storage types
+	struct attr_spec {
+		std::uint64_t attr;
+		std::uint64_t form;
+	};
+
+	struct abbrev {
+		std::uint64_t code;
+		std::uint64_t tag;
+		bool has_children;
+
+		std::vector<attr_spec> attr_specs;
+	};
+}

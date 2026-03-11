@@ -11,11 +11,13 @@
 namespace kdebugger {
 	
 	class elf;
+	class compile_unit;
 
 	class dwarf {
 		
 		const elf * m_Elf;
 
+		std::vector<std::unique_ptr<compile_unit>> m_CompileUnits
 		std::unordered_map<std::size_t, std::unordered_map<std::uint64_t, abbrev>> m_AbbrevTables;
 
 		public:
@@ -23,6 +25,10 @@ namespace kdebugger {
 			const elf * elf_file() const { return m_Elf; }
 	
 			const std::unordered_map<std::uint64_t, abbrev> & get_abbrev_table(std::size_t offset);
+	
+			const std::vector<std::unique_ptr<compile_unit>> & compile_units() const {
+				return m_CompileUnits
+			}
 	};
 
 	class cursor {

@@ -165,6 +165,15 @@ namespace kdebugger {
 						m_Pos += 4;
 						break;
 
+					case DW_FORM_sdata:
+						sleb128();
+						break;
+
+					case DW_FORM_udata:
+					case DW_FORM_ref_udata:
+						uleb128();
+						break;
+
 					default:
 						kdebugger::error::send("Unrecognized DWARF form");
 				}
